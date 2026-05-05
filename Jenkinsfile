@@ -2,16 +2,29 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_CREDENTIALS = credentials('docker-cred') // Docker Hub creds
+        DOCKERHUB_CREDENTIALS = credentials('docker-cred')
         IMAGE_NAME = 'techsubrat07/devsecops-bankapp'
         REMOTE_HOST = 'ec2-user@98.87.150.98'
         REMOTE_APP_NAME = 'jenkins_dockerapp'
     }
 
     stages {
+
         stage('Checkout from GitHub') {
             steps {
                 git branch: 'main', url: 'https://github.com/subratgithub/DevSecOps-BankingApp.git'
+            }
+        }
+
+        stage('Build JAR') {
+            steps {
+                sh 'mvn clean package -DskipTests'
+            }
+        }
+
+        stage('Verify JAR') {
+            steps {
+                sh 'ls -la target'
             }
         }
 
@@ -32,7 +45,7 @@ pipeline {
 
         stage('Deploy to EC2') {
             steps {
-                sshagent(['ssh-acceskey']) {  // <-- Updated with correct EC2 key ID
+                sshagent(['ssh-acceskey']) {
                     sh """
                         ssh -o StrictHostKeyChecking=no $REMOTE_HOST '
                             docker pull $IMAGE_NAME:latest &&
