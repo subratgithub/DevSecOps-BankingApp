@@ -5,7 +5,7 @@ pipeline {
         DOCKERHUB_CREDENTIALS = credentials('docker-cred')
         IMAGE_NAME = 'techsubrat07/devsecops-bankapp'
         IMAGE_TAG = "${BUILD_NUMBER}"
-        REMOTE_HOST = 'ec2-user@98.87.150.98'
+        REMOTE_HOST = 'ec2-user@52.23.216.255'
         REMOTE_APP_NAME = 'jenkins_dockerapp'
     }
 
