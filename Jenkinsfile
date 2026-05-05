@@ -22,16 +22,17 @@ pipeline {
             }
         }
 
-        stage('Build JAR') {
-            steps {
-                sh 'mvn clean package'
-            }
+        stage('Build + Test + Coverage') {
+             steps {
+                  sh 'mvn clean verify'
+             }
         }
 
-        stage('Verify JAR') {
-            steps {
-                sh 'ls -la target'
-            }
+        stage('Verify Artifacts') {
+              steps {
+                   sh 'ls -la target'
+                   sh 'ls -la target/site/jacoco'
+              }
         }
 
         stage('Build Docker Image') {
