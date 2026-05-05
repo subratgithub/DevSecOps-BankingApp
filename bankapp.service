@@ -1,0 +1,19 @@
+[Unit]
+Description=BankApp Spring Boot Application
+After=network.target
+
+[Service]
+Type=simple
+User=ec2-user
+WorkingDirectory=/home/ec2-user/bankapp
+ExecStart=/usr/bin/java -jar /home/ec2-user/bankapp/app.jar
+Restart=on-failure
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=bankapp
+Environment="SPRING_PROFILES_ACTIVE=docker"
+
+[Install]
+WantedBy=multi-user.target
+
