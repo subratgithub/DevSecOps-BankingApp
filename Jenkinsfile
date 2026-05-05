@@ -51,7 +51,7 @@ pipeline {
                             docker pull $IMAGE_NAME:latest &&
                             docker stop $REMOTE_APP_NAME || true &&
                             docker rm $REMOTE_APP_NAME || true &&
-                            docker run -d --name $REMOTE_APP_NAME -p 8080:8080 $IMAGE_NAME:latest
+                            docker run -d --name $REMOTE_APP_NAME -p 9090:9090 $IMAGE_NAME:latest
                         '
                     """
                 }
