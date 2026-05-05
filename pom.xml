@@ -32,7 +32,7 @@
         <!-- SonarQube config -->
         <sonar.projectKey>bankapp</sonar.projectKey>
         <sonar.projectName>Banking App</sonar.projectName>
-        <sonar.host.url>http://98.87.150.98:9000</sonar.host.url>
+        <sonar.host.url>http://52.23.216.255:9000</sonar.host.url>
     </properties>
 	<dependencies>
 		<dependency>
