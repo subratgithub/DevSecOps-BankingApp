@@ -13,6 +13,9 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>bankapp</name>
 	<description>Banking Web Application</description>
+	<sonar.projectKey>bankapp</sonar.projectKey>
+    <sonar.projectName>Banking App</sonar.projectName>
+    <sonar.host.url>http://http://98.87.150.98:9000</sonar.host.url>
 	<url/>
 	<licenses>
 		<license/>
