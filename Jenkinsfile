@@ -18,12 +18,17 @@ pipeline {
         }
 
         stage('Build + Test + Coverage + Sonar') {
-            steps {
-                withSonarQubeEnv('sonar-server') {
-                    sh 'mvn clean verify sonar:sonar'
-                }
-            }
+    steps {
+        withSonarQubeEnv('sonar-server') {
+            sh '''
+            mvn clean verify sonar:sonar \
+            -Dsonar.junit.reportPaths=target/surefire-reports \
+            -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
+            -Dsonar.ws.timeout=120
+            '''
         }
+    }
+
 
         stage('Quality Gate') {
             steps {
