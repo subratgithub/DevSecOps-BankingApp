@@ -4,40 +4,45 @@ pipeline {
     environment {
         DOCKERHUB_CREDENTIALS = credentials('docker-cred')
         IMAGE_NAME = 'techsubrat07/devsecops-bankapp'
+        IMAGE_TAG = "${BUILD_NUMBER}"
         REMOTE_HOST = 'ec2-user@98.87.150.98'
         REMOTE_APP_NAME = 'jenkins_dockerapp'
     }
 
     stages {
 
-        stage('Checkout from GitHub') {
+        stage('Checkout') {
             steps {
                 git branch: 'main', url: 'https://github.com/subratgithub/DevSecOps-BankingApp.git'
             }
         }
 
-        stage('Run Unit Tests') {
+        stage('Build + Test + Coverage + Sonar') {
             steps {
-                sh 'mvn test'
+                withSonarQubeEnv('sonar-server') {
+                    sh 'mvn clean verify sonar:sonar'
+                }
             }
         }
 
-        stage('Build + Test + Coverage') {
-             steps {
-                  sh 'mvn clean verify'
-             }
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 2, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
         }
 
         stage('Verify Artifacts') {
-              steps {
-                   sh 'ls -la target'
-                   sh 'ls -la target/site/jacoco'
-              }
+            steps {
+                sh 'ls -la target'
+                sh 'ls -la target/site/jacoco'
+            }
         }
 
         stage('Build Docker Image') {
             steps {
-                sh "docker build -t $IMAGE_NAME:latest ."
+                sh "docker build -t $IMAGE_NAME:$IMAGE_TAG ."
             }
         }
 
@@ -45,7 +50,7 @@ pipeline {
             steps {
                 sh """
                     echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin
-                    docker push $IMAGE_NAME:latest
+                    docker push $IMAGE_NAME:$IMAGE_TAG
                 """
             }
         }
@@ -55,21 +60,49 @@ pipeline {
                 sshagent(['ssh-acceskey']) {
                     sh """
                         ssh -o StrictHostKeyChecking=no $REMOTE_HOST '
-                            docker pull $IMAGE_NAME:latest &&
+                            docker pull $IMAGE_NAME:$IMAGE_TAG &&
                             docker stop $REMOTE_APP_NAME || true &&
                             docker rm $REMOTE_APP_NAME || true &&
-                            docker run -d --name $REMOTE_APP_NAME -p 9090:9090 $IMAGE_NAME:latest
+                            docker run -d \
+                                --restart unless-stopped \
+                                --name $REMOTE_APP_NAME \
+                                -p 9090:9090 \
+                                $IMAGE_NAME:$IMAGE_TAG &&
+                            docker image prune -f
                         '
                     """
                 }
             }
         }
+
+        stage('Health Check') {
+            steps {
+                sh '''
+                    sleep 10
+                    curl -f http://98.87.150.98:9090/login
+                '''
+            }
+        }
     }
 
     post {
+        always {
+            junit 'target/surefire-reports/*.xml'
+
+            publishHTML([
+                allowMissing: false,
+                alwaysLinkToLastBuild: true,
+                keepAll: true,
+                reportDir: 'target/site/jacoco',
+                reportFiles: 'index.html',
+                reportName: 'JaCoCo Coverage Report'
+            ])
+        }
+
         success {
             echo '✅ Deployment Successful!'
         }
+
         failure {
             echo '❌ Deployment Failed!'
         }
