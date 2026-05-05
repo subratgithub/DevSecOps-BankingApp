@@ -17,7 +17,7 @@ pipeline {
             }
         }
 
-        stage('Build + Test + Coverage + Sonar') {
+       stage('Build + Test + Coverage + Sonar') {
     steps {
         withSonarQubeEnv('sonar-server') {
             sh '''
@@ -28,7 +28,7 @@ pipeline {
             '''
         }
     }
-
+}
 
         stage('Quality Gate') {
             steps {
