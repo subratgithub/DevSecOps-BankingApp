@@ -53,9 +53,19 @@ pipeline {
             }
         }
 
+        stage('Cleanup Old Files') {
+    steps {
+        sh '''
+            docker system prune -af || true
+            docker volume prune -f || true
+            rm -rf /var/lib/jenkins/.cache/trivy || true
+        '''
+    }
+}
+
         stage('Trivy Scan') {
-       steps {
-          sh """
+    steps {
+        sh """
             trivy image \
             --scanners vuln \
             --severity HIGH,CRITICAL \
@@ -63,8 +73,8 @@ pipeline {
             --no-progress \
             $IMAGE_NAME:$IMAGE_TAG
         """
-       }
-   }
+    }
+}
 
         stage('Push to Docker Hub') {
             steps {
