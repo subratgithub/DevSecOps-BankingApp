@@ -45,15 +45,7 @@ pipeline {
             }
         }
 
-        
-
-        stage('Build Docker Image') {
-            steps {
-                sh "docker build -t $IMAGE_NAME:$IMAGE_TAG ."
-            }
-        }
-
-        stage('Cleanup Old Files') {
+stage('Cleanup Old Files') {
     steps {
         sh '''
             docker system prune -af || true
@@ -62,6 +54,12 @@ pipeline {
         '''
     }
 }
+        
+        stage('Build Docker Image') {
+            steps {
+                sh "docker build -t $IMAGE_NAME:$IMAGE_TAG ."
+            }
+        }
 
         stage('Trivy Scan') {
     steps {
