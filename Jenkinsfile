@@ -5,7 +5,7 @@ pipeline {
         DOCKERHUB_CREDENTIALS = credentials('docker-cred')
         IMAGE_NAME = 'techsubrat07/devsecops-bankapp'
         IMAGE_TAG = "${BUILD_NUMBER}"
-        REMOTE_HOST = 'ec2-user@52.23.216.255'
+        REMOTE_HOST = 'ec2-user@35.171.82.156'
         REMOTE_APP_NAME = 'jenkins_dockerapp'
     }
 
@@ -84,7 +84,7 @@ pipeline {
             steps {
                 sh '''
                     sleep 10
-                    curl -f http://98.87.150.98:9090/login
+                    curl -f http://35.171.82.156:9090/login
                 '''
             }
         }
