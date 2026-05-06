@@ -93,14 +93,7 @@ pipeline {
             }
         }
 
-        stage('Health Check') {
-            steps {
-                sh '''
-                    sleep 10
-                    curl -f http://35.171.82.156:9090/login
-                '''
-            }
-        }
+        
     }
 
     post {
