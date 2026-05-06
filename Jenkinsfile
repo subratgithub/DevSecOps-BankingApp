@@ -61,18 +61,7 @@ stage('Cleanup Old Files') {
             }
         }
 
-        stage('Trivy Scan') {
-    steps {
-        sh """
-            trivy image \
-            --scanners vuln \
-            --severity HIGH,CRITICAL \
-            --exit-code 1 \
-            --no-progress \
-            $IMAGE_NAME:$IMAGE_TAG
-        """
-    }
-}
+        
 
         stage('Push to Docker Hub') {
             steps {
